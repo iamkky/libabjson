@@ -1,0 +1,189 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#include "abjson/json_lex.h"
+#include "abjson/json_parser.tokens.h"
+#include "abjson/json_parser.h"
+
+//#define DDEBUG 1
+
+// See grammar.txt
+
+//ParserName FirstSymbol LexName
+//ParserNodeType
+
+//void JsonParserTypeDeallocator(JsonParserType *node)
+//{
+//}
+
+%%JsonParser json json_lex
+union {
+	struct {
+		char		*key;
+		JsonValue	element;
+	} pair;
+	JsonValue	value;
+	double		number;
+	char		*str;
+}
+%%
+
+json:
+	element {
+		result.value = terms[0].value;
+	}
+	;
+
+element:
+	value {
+		result.value = terms[0].value;
+	}
+	;
+
+value:
+	object {
+		result.value = terms[0].value;
+		jsonValueInvert(result.value);
+	}
+	| array {
+		result.value = terms[0].value;
+		jsonValueInvert(result.value);
+	}
+	| STRING {
+		result.value = JsonValueNew();
+		jsonValueAssign(result.value, JSON_STRING, terms[0].str);
+		free(terms[0].str);
+	}
+	| number {
+		result.value = JsonValueNew();
+		jsonValueAssign(result.value, JSON_NUMBER, &terms[0].number);
+	}
+	| JSONTRUE {
+		result.value = JsonValueNew();
+		int bool = 1;
+		jsonValueAssign(result.value, JSON_BOOLEAN, &bool);
+	}
+	| JSONFALSE {
+		result.value = JsonValueNew();
+		int bool = 0;
+		jsonValueAssign(result.value, JSON_BOOLEAN, &bool);
+	}
+	| JSONNULL {
+		result.value = JsonValueNew();
+	}
+	;
+
+object:
+	LBRACE objectlist {
+		result.value = terms[1].value;
+	}
+	;
+
+objectlist:
+	RBRACE {
+		result.value = JsonValueNew();
+		jsonValueAssign(result.value, JSON_OBJECT, NULL);
+	}
+	| members RBRACE {
+		result.value = terms[0].value;
+	}
+	;
+
+member:
+	STRING COLON element {
+		result.pair.key = terms[0].str;
+		result.pair.element = terms[2].value;
+	}
+	;
+
+members:
+	member members_l {
+		result.value = terms[1].value;
+		jsonValueSet_k(result.value, terms[0].pair.key, terms[0].pair.element);
+		if(terms[0].pair.key) free(terms[0].pair.key);
+	}
+	;
+
+members_l:
+	COMMA member members_l {
+		result.value = terms[2].value;
+		jsonValueSet_k(result.value, terms[1].pair.key, terms[1].pair.element);
+		if(terms[1].pair.key) free(terms[1].pair.key);
+	}
+	| {
+		result.value = JsonValueNew();
+		jsonValueAssign(result.value, JSON_OBJECT, NULL);
+	}
+	;
+
+array:
+	LBRACKET arraylist {
+		result.value = terms[1].value;
+	}
+	;
+
+arraylist:
+	RBRACKET {
+		result.value = JsonValueNew();
+		jsonValueAssign(result.value, JSON_ARRAY, NULL);
+	}
+	| elements RBRACKET {
+		result.value = terms[0].value;
+	}
+	;
+
+elements:
+	element elements_l {
+		result.value = terms[1].value;
+		jsonValueAdd_i(result.value, terms[0].value);
+	}
+	;
+
+elements_l:
+	COMMA element elements_l {
+		result.value = terms[2].value;
+		jsonValueAdd_i(result.value, terms[1].value);
+	}
+	| {
+		result.value = JsonValueNew();
+		jsonValueAssign(result.value, JSON_ARRAY, NULL);
+	}
+	;
+
+number:
+	INTEGER floatpart
+		{ 
+			char tmp[256];
+			if(terms[1].str == NULL){
+				snprintf(tmp, 256, "%s", terms[0].str);
+				free(terms[0].str);
+			}else{
+				snprintf(tmp, 256, "%s.%s", terms[0].str, terms[1].str);
+				free(terms[0].str);
+				free(terms[1].str);
+			}
+			result.number = atof(tmp);
+		}
+	;
+
+floatpart:
+	FRACTION expoent
+		{ 
+			char tmp[256];
+			snprintf(tmp, 256, "%s%s", terms[0].str, terms[1].str ? terms[1].str : "");
+			if(terms[0].str) free(terms[0].str);
+			if(terms[1].str) free(terms[1].str);
+			result.str = strdup(tmp);
+		}
+	| 
+	;
+
+expoent:
+	EXPOENT {
+		result.str = terms[0].str;
+	}
+	|
+	;
+

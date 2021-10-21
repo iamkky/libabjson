@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#include "abjson/json_lex.h"
+#include "abjson/json_parser.h"
+#include "abjson/json_parser.tokens.h"
+
+// Lex Helper function
+
+static char *getString(char *input, int *cursor, char escape, char closure)
+{
+char *tmp, *newtmp, *p, last;
+int  size, used, count;
+
+	if((p = tmp = malloc(size = 128))==NULL) return NULL;
+	*p = used = count = 0;
+
+	if(*input++!=closure) return tmp;
+
+	while((last = *p++ = *input++)){
+		count++;
+		if(last==closure){
+			*(p-1)=0;
+			break;
+		}else if(last==escape && *input==closure) {
+			*(p-1)=closure;
+			input++;
+			count++;
+		}
+		if(++used>=size-1) {
+			if((newtmp = realloc(tmp, size = (2 * size)))==NULL) {
+				free(tmp);
+				return NULL;
+			}
+			p = (tmp = newtmp) + count;
+		}
+	}
+
+	(*cursor)+=count;
+	return tmp;
+}
+
+
+%%json_lex JsonParserType
+
+%define D	0-9
+
+true		: value->str = NULL; return JSONTRUE;
+false		: value->str = NULL; return JSONFALSE;
+null		: value->str = NULL; return JSONNULL;
+[		: value->str = NULL; return LBRACKET;
+]		: value->str = NULL; return RBRACKET;
+{		: value->str = NULL; return LBRACE;
+}		: value->str = NULL; return RBRACE;
+:		: value->str = NULL; return COLON;
+,		: value->str = NULL; return COMMA;
+"		: value->str = getString(input, cursor, '\\', '\"'); return STRING;
+\D\D*		: value->str = nrDupToken(input, size); return INTEGER;
+-\D\D*		: value->str = nrDupToken(input, size); return INTEGER;
+\.\D\D*		: value->str = nrDupToken(input+1, size-1); return FRACTION;
+E+\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
+e+\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
+E-\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
+e-\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
+\s		: 
+\n		: 
+\t		: 
+\r		: 
+
+

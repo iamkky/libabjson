@@ -1,0 +1,68 @@
+/*
+  =====================================================================
+  ==== Original JSON Grammar from site:
+  =====================================================================
+
+json: element
+
+element: ws value ws
+
+value: object | array | STRING | number | true | false | null
+
+true: 't' 'r' 'u' 'e'
+
+false: 'f' 'a' 'l' 's' 'e'
+
+null: 'n' 'u' 'l' 'l'
+
+object: '{' ws '}' | '{' members '}' 
+
+members: members ',' member | member
+
+member: ws STRING ws ':' element 
+
+array: '[' ws ']' | '[' elements ']'
+
+elements: elements ',' element | element
+
+number: INTEGER FRACTION EXPOENT | INTEGER FRACTION | INTEGER
+
+ws: ' ' ws | '\n' ws | '\r' ws | '\t' ws | empty
+
+*/
+
+
+/*
+  =============================================================================================
+  ==== Rewriting for better parsing and adapting to a Recursive Descendent Predictive Parser
+  ==== Left recursion removed
+  ==== Considering a white space supressing lex (ws = ' '|'\n'|'\r'|'\t' out of string context)
+  ==== Moving 'true', 'false' and ' null' to lex
+  =============================================================================================
+
+json: element
+
+element: value
+
+value: object | array | STRING | number | JSONTRUE | JSONFALSE | JSONNULL
+
+object: '{' members '}' 
+
+member: STRING ':' element 
+
+members: member members_l | empty
+members_l: ',' member members_l | empty
+
+array: '[' elements ']'
+
+elements: element elements_l
+elements_l: ',' elmenent elements_l | empty
+
+number: INTEGER floatpart 
+
+floatpart: FRACTION expoent | empty
+
+expoent: EXPOENT | empty
+
+*/
+
