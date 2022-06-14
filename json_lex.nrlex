@@ -65,7 +65,7 @@ e+\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
 E-\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
 e-\D\D*		: value->str = nrDupToken(input+1, size-1); return EXPOENT;
 \s		: 
-\n		: 
+\n		: *((int *)extra) = *((int *)extra) + 1; 
 \t		: 
 \r		: 
 

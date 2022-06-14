@@ -1,6 +1,6 @@
 
-NRLEX=../aslt/nrlex
-RDPPGEN=../aslt/rdppgen
+NRLEX=nrlex
+RDPPGEN=rdppgen
 
 CFLAGS+=-I. -gstabs
 

@@ -172,18 +172,26 @@ floatpart:
 	FRACTION expoent
 		{ 
 			char tmp[256];
-			snprintf(tmp, 256, "%s%s", terms[0].str, terms[1].str ? terms[1].str : "");
+			if(terms[1].str){
+				snprintf(tmp, 256, "%sE%s", terms[0].str, terms[1].str);
+			}else{
+				snprintf(tmp, 256, "%s", terms[0].str);
+			}
 			if(terms[0].str) free(terms[0].str);
 			if(terms[1].str) free(terms[1].str);
 			result.str = strdup(tmp);
 		}
-	| 
+	| {
+			result.str = NULL;
+		}
 	;
 
 expoent:
 	EXPOENT {
 		result.str = terms[0].str;
 	}
-	|
+	| {
+		result.str = NULL;
+	}
 	;
 

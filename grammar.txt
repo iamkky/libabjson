@@ -40,29 +40,56 @@ ws: ' ' ws | '\n' ws | '\r' ws | '\t' ws | empty
   ==== Moving 'true', 'false' and ' null' to lex
   =============================================================================================
 
-json: element
+json:
+		element
 
-element: value
+element:
+		value
 
-value: object | array | STRING | number | JSONTRUE | JSONFALSE | JSONNULL
+value:
+		object | array | STRING | number | JSONTRUE | JSONFALSE | JSONNULL
 
-object: '{' members '}' 
+object:
+		'{' objectlist
 
-member: STRING ':' element 
+objectlist:	
+		'}'
+		| members '}' 
 
-members: member members_l | empty
-members_l: ',' member members_l | empty
+member:
+		STRING ':' element 
 
-array: '[' elements ']'
+members:
+		member members_l
+		| empty
 
-elements: element elements_l
-elements_l: ',' elmenent elements_l | empty
+members_l:
+		',' member members_l
+		| empty
 
-number: INTEGER floatpart 
+array:
+		'[' arraylist
 
-floatpart: FRACTION expoent | empty
+arraylist:
+		']'
+		elements ']'
 
-expoent: EXPOENT | empty
+elements:
+		element elements_l
+
+elements_l:
+		',' elmenent elements_l
+		| empty
+
+number:
+		INTEGER floatpart 
+
+floatpart:
+		FRACTION expoent
+		| empty
+
+expoent:	EXPOENT
+		| empty
 
 */
 
