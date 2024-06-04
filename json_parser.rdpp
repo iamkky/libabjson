@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "abd/printf.h"
 #include "abjson/json_lex.h"
 #include "abjson/json_parser.tokens.h"
 #include "abjson/json_parser.h"

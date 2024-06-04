@@ -1,10 +1,12 @@
 
+include make.wasm
+
 NRLEX=nrlex
 RDPPGEN=rdppgen
 
-CFLAGS+=-I. -gstabs
+CFLAGS+=-I.
 
-all: libabjson.a jsonparser
+all: libabjson.a 
 
 jsonparser: jsonparser.o libabjson.a
 	${CC} ${CFLAGS} -o jsonparser jsonparser.o libabjson.a

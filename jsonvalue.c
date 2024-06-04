@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 //#include "mpaland/printf.h"
+#include "abd/printf.h"
 #include "abjson/jsonvalue.h"
 
 //#include "abd/debug.h" 
@@ -100,9 +101,9 @@ int jsonValueSet_k(JsonValue self, const char *key, JsonValue e)
 {
 int allocated;
 
-	if(self==NULL) -1;
-	if(key==NULL) -1;
-	if(e==NULL) -1;
+	if(self==NULL) return -1;
+	if(key==NULL) return -1;
+	if(e==NULL) return -1;
 	if(self->type!=JSON_OBJECT) return -1;
 
 	allocated = self->value.o.allocated;
