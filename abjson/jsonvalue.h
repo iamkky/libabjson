@@ -1,5 +1,5 @@
-#ifndef _ABJSON_H_
-#define _ABJSON_H_
+#ifndef _ABJSON_VALUE_H_
+#define _ABJSON_VALUE_H_
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -42,6 +42,7 @@ char		*jsonValueGetAsNumber(JsonValue self);
 char		*jsonValueGetAsString(JsonValue self);
 JsonValue	jsonValueGet_k(JsonValue self, const char *key);
 JsonValue	jsonValueGet_i(JsonValue self, int index);
+char		*jsonValueGet_ik(JsonValue self, int index);
 int		jsonValueSet_k(JsonValue self, const char *key, JsonValue e);
 int		jsonValueAdd_i(JsonValue self, JsonValue e);
 

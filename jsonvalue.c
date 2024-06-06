@@ -203,6 +203,7 @@ int jsonValueGetLength(JsonValue self)
 	if(self==NULL) return 0;
 
 	if(self->type==JSON_ARRAY) return self->value.a.size;
+	if(self->type==JSON_OBJECT) return self->value.o.size;
 	return 0;
 }
 
@@ -221,15 +222,27 @@ JsonValue jsonValueGet_k(JsonValue self, const char *key)
 	return NULL;
 }
 
+char *jsonValueGet_ik(JsonValue self, int index)
+{
+	if(self==NULL) return NULL;
+
+	if(index<0) return NULL;
+
+	if(self->type==JSON_OBJECT && index<self->value.o.size) return self->value.o.keys[index];
+	
+	return NULL;
+}
+
 JsonValue jsonValueGet_i(JsonValue self, int index)
 {
 	if(self==NULL) return NULL;
 
-	if(self->type!=JSON_ARRAY) return NULL;
+	if(index<0) return NULL;
 
-	if(index<0 || index>=self->value.a.size) return NULL;
-
-	return self->value.a.buffer[index];
+	if(self->type==JSON_ARRAY && index<self->value.a.size) return self->value.a.buffer[index];
+	if(self->type==JSON_OBJECT && index<self->value.o.size) return self->value.o.values[index];
+	
+	return NULL;
 }
 
 char *jsonValueGetAsString(JsonValue self)
