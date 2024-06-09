@@ -3,8 +3,10 @@
 #include <stdio.h>
 //#include "mpaland/printf.h"
 #include "abd/printf.h"
+#include "abd/errLog.h"
 #include "abjson/jsonvalue.h"
 
+#define printf errLogf
 //#include "abd/debug.h" 
 
 // Implements a C representation for JSON values
