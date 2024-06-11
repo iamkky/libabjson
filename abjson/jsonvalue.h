@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 
-enum JsonValueTypes {JSON_NULL = 0, JSON_NUMBER, JSON_BOOLEAN, JSON_STRING, JSON_OBJECT, JSON_ARRAY};
+enum JsonValueTypes {JSON_NULL = 0, JSON_NUMBER, JSON_BOOLEAN, JSON_STRING, JSON_OBJECT, JSON_ARRAY, JSON_UNDEFINED};
 
 typedef struct JsonValue_struct *JsonValue;
 

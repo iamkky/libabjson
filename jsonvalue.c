@@ -197,6 +197,7 @@ int	  size, n;
 
 int jsonValueGetType(JsonValue self)
 {
+	if(self==NULL) return JSON_UNDEFINED;
 	return self->type;
 }
 
