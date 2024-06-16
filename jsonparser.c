@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "abjson/jsonvalue.h"
+#include "abd/AData.c.h"
 #include "abjson/json_parser.h"
 
 char *readToBuffer(int fd, int inisize, int extrasize, int *readsize)
@@ -35,7 +35,7 @@ char *buffer, *tmp;
 
 int main(int argc, char **argv)
 {
-JsonValue  json;
+AData  json;
 JsonParser jp;
 char *buffer;
 int bytes, result;
@@ -56,10 +56,10 @@ int lcount;
 
 	if(result>0){
 		json = jp->value[0].value;
-		fprintf(stderr,"Value Type %02d\n", jsonValueGetType(json));
-		jsonValuePrint(json);
+		fprintf(stderr,"Value Type %02d\n", aDataGetType(json));
+		aDataPrint(json);
 		fprintf(stdout,"\n");
-		jsonValueFree(json);
+		ADataFree(json);
 	}else{
 		fprintf(stderr,"Failed to parse line %d\n", lcount);
 	}

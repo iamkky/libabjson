@@ -23,9 +23,9 @@
 union {
 	struct {
 		char		*key;
-		JsonValue	element;
+		AData	element;
 	} pair;
-	JsonValue	value;
+	AData	value;
 	double		number;
 	char		*str;
 }
@@ -46,33 +46,33 @@ element:
 value:
 	object {
 		result.value = terms[0].value;
-		jsonValueInvert(result.value);
+		aDataInvert(result.value);
 	}
 	| array {
 		result.value = terms[0].value;
-		jsonValueInvert(result.value);
+		aDataInvert(result.value);
 	}
 	| STRING {
-		result.value = JsonValueNew();
-		jsonValueAssign(result.value, JSON_STRING, terms[0].str);
+		result.value = CNew(AData);
+		aDataAssign(result.value, ADATA_STRING, terms[0].str);
 		free(terms[0].str);
 	}
 	| number {
-		result.value = JsonValueNew();
-		jsonValueAssign(result.value, JSON_NUMBER, &terms[0].number);
+		result.value = CNew(AData);
+		aDataAssign(result.value, ADATA_NUMBER, &terms[0].number);
 	}
 	| JSONTRUE {
-		result.value = JsonValueNew();
+		result.value = CNew(AData);
 		int bool = 1;
-		jsonValueAssign(result.value, JSON_BOOLEAN, &bool);
+		aDataAssign(result.value, ADATA_BOOLEAN, &bool);
 	}
 	| JSONFALSE {
-		result.value = JsonValueNew();
+		result.value = CNew(AData);
 		int bool = 0;
-		jsonValueAssign(result.value, JSON_BOOLEAN, &bool);
+		aDataAssign(result.value, ADATA_BOOLEAN, &bool);
 	}
 	| JSONNULL {
-		result.value = JsonValueNew();
+		result.value = CNew(AData);
 	}
 	;
 
@@ -84,8 +84,8 @@ object:
 
 objectlist:
 	RBRACE {
-		result.value = JsonValueNew();
-		jsonValueAssign(result.value, JSON_OBJECT, NULL);
+		result.value = CNew(AData);
+		aDataAssign(result.value, ADATA_OBJECT, NULL);
 	}
 	| members RBRACE {
 		result.value = terms[0].value;
@@ -102,7 +102,7 @@ member:
 members:
 	member members_l {
 		result.value = terms[1].value;
-		jsonValueSet_k(result.value, terms[0].pair.key, terms[0].pair.element);
+		aDataSet_k(result.value, terms[0].pair.key, terms[0].pair.element);
 		if(terms[0].pair.key) free(terms[0].pair.key);
 	}
 	;
@@ -110,12 +110,12 @@ members:
 members_l:
 	COMMA member members_l {
 		result.value = terms[2].value;
-		jsonValueSet_k(result.value, terms[1].pair.key, terms[1].pair.element);
+		aDataSet_k(result.value, terms[1].pair.key, terms[1].pair.element);
 		if(terms[1].pair.key) free(terms[1].pair.key);
 	}
 	| {
-		result.value = JsonValueNew();
-		jsonValueAssign(result.value, JSON_OBJECT, NULL);
+		result.value = CNew(AData);
+		aDataAssign(result.value, ADATA_OBJECT, NULL);
 	}
 	;
 
@@ -127,8 +127,8 @@ array:
 
 arraylist:
 	RBRACKET {
-		result.value = JsonValueNew();
-		jsonValueAssign(result.value, JSON_ARRAY, NULL);
+		result.value = CNew(AData);
+		aDataAssign(result.value, ADATA_ARRAY, NULL);
 	}
 	| elements RBRACKET {
 		result.value = terms[0].value;
@@ -138,18 +138,18 @@ arraylist:
 elements:
 	element elements_l {
 		result.value = terms[1].value;
-		jsonValueAdd_i(result.value, terms[0].value);
+		aDataAdd_i(result.value, terms[0].value);
 	}
 	;
 
 elements_l:
 	COMMA element elements_l {
 		result.value = terms[2].value;
-		jsonValueAdd_i(result.value, terms[1].value);
+		aDataAdd_i(result.value, terms[1].value);
 	}
 	| {
-		result.value = JsonValueNew();
-		jsonValueAssign(result.value, JSON_ARRAY, NULL);
+		result.value = CNew(AData);
+		aDataAssign(result.value, ADATA_ARRAY, NULL);
 	}
 	;
 
